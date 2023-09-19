@@ -39,6 +39,7 @@ class SwipableStack extends StatefulWidget {
     this.hitTestBehavior = HitTestBehavior.deferToChild,
     this.dragStartDuration = const Duration(milliseconds: 150),
     this.dragStartCurve = Curves.easeOut,
+    this.showCardFromTop = false,
   })  : controller = controller ?? SwipableStackController(),
         cancelAnimationCurve =
             cancelAnimationCurve ?? _defaultCancelAnimationCurve,
@@ -123,6 +124,9 @@ class SwipableStack extends StatefulWidget {
   ///
   /// Only relevant if [dragStartBehavior] is [DragStartBehavior.down].
   final Curve dragStartCurve;
+
+  /// Whether to show the card from the top, ny default it is shown from the bottom
+  final bool showCardFromTop;
 
   static const double _defaultHorizontalSwipeThreshold = 0.44;
   static const double _defaultVerticalSwipeThreshold = 0.32;
@@ -495,6 +499,7 @@ class _SwipableStackState extends State<SwipableStack>
           viewFraction: widget.viewFraction,
           swipeAnchor: widget.swipeAnchor,
           areaConstraints: constraints,
+          showCardFromTop: widget.showCardFromTop,
           child: child,
         );
       },
@@ -522,6 +527,7 @@ class _SwipableStackState extends State<SwipableStack>
             viewFraction: widget.viewFraction,
             swipeAnchor: widget.swipeAnchor,
             areaConstraints: constraints,
+            showCardFromTop: widget.showCardFromTop,
             child: child,
           ),
         );
@@ -569,6 +575,7 @@ class _SwipableStackState extends State<SwipableStack>
       session: session,
       areaConstraints: constraints,
       swipeAnchor: widget.swipeAnchor,
+      showCardFromTop: widget.showCardFromTop,
       child: overlay,
     );
   }
@@ -769,6 +776,7 @@ class _SwipablePositioned extends StatelessWidget {
     required this.child,
     required this.viewFraction,
     required this.swipeAnchor,
+    required this.showCardFromTop,
     Key? key,
   })  : assert(0 <= viewFraction && viewFraction <= 1),
         super(key: key);
@@ -779,6 +787,7 @@ class _SwipablePositioned extends StatelessWidget {
     required Widget child,
     required double viewFraction,
     required SwipeAnchor? swipeAnchor,
+    required bool showCardFromTop,
   }) {
     return _SwipablePositioned(
       key: const ValueKey('overlay'),
@@ -787,6 +796,7 @@ class _SwipablePositioned extends StatelessWidget {
       viewFraction: viewFraction,
       areaConstraints: areaConstraints,
       swipeAnchor: swipeAnchor,
+      showCardFromTop: showCardFromTop,
       child: IgnorePointer(
         child: child,
       ),
@@ -799,6 +809,7 @@ class _SwipablePositioned extends StatelessWidget {
   final BoxConstraints areaConstraints;
   final double viewFraction;
   final SwipeAnchor? swipeAnchor;
+  final bool showCardFromTop;
 
   Offset get _currentPositionDiff => session.difference;
 
@@ -866,13 +877,15 @@ class _SwipablePositioned extends StatelessWidget {
           areaConstraints * (1 - _animationProgress()) * _animationRate / 2;
       return Offset(
         constraintsDiff.maxWidth,
-        constraintsDiff.maxHeight,
+        showCardFromTop
+            ? constraintsDiff.maxHeight * -1
+            : constraintsDiff.maxHeight,
       );
     } else {
       final maxDiff = areaConstraints * _animationRate / 2;
       return Offset(
         maxDiff.maxWidth,
-        maxDiff.maxHeight,
+        showCardFromTop ? maxDiff.maxHeight * -1 : maxDiff.maxHeight,
       );
     }
   }

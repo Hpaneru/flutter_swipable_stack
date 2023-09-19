@@ -67,6 +67,7 @@ class _HomeState extends State<Home> {
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: SwipableStack(
+                  showCardFromTop: true,
                   detectableSwipeDirections: const {
                     SwipeDirection.right,
                     SwipeDirection.left,
