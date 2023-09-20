@@ -819,6 +819,8 @@ class _SwipablePositioned extends StatelessWidget {
 
   bool get _isSecond => index == 1;
 
+  bool get _isThird => index == 2;
+
   bool get _swipingTop => session.start.dy < areaConstraints.maxHeight / 2;
 
   double get _rotationAngle {
@@ -864,6 +866,8 @@ class _SwipablePositioned extends StatelessWidget {
     } else if (_isSecond) {
       return areaConstraints *
           (1 - _animationRate + _animationRate * _animationProgress());
+    } else if (_isThird) {
+      return areaConstraints * (0.9 - _animationRate);
     } else {
       return areaConstraints * (1 - _animationRate);
     }
@@ -878,7 +882,16 @@ class _SwipablePositioned extends StatelessWidget {
       return Offset(
         constraintsDiff.maxWidth,
         showCardFromTop
-            ? constraintsDiff.maxHeight * -1
+            ? constraintsDiff.maxHeight * -1.5
+            : constraintsDiff.maxHeight,
+      );
+    } else if (_isThird) {
+      final constraintsDiff =
+          areaConstraints * (2 - _animationProgress()) * _animationRate / 2;
+      return Offset(
+        constraintsDiff.maxWidth * 1.5,
+        showCardFromTop
+            ? constraintsDiff.maxHeight * -1.4
             : constraintsDiff.maxHeight,
       );
     } else {
